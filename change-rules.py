@@ -4,7 +4,7 @@ drc_3 = "/etc/snort/rules"
 for dirName, subdirList, fileList in os.walk(drc_3):
     for fname in fileList:
         try:
-            if fname.endswith(".rules") and fname.startswith("1community-web-client"):
+            if fname.endswith(".rules") and fname.startswith("community-web-client"):
                 print fname
                 x=fname
                 f1 = open(x, 'r+')
