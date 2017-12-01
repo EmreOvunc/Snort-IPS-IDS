@@ -1,0 +1,26 @@
+# Copyright 2001-2013 Sourcefire, Inc. All Rights Reserved.
+#
+# This file contains (i) proprietary rules that were created, tested and certified by
+# Sourcefire, Inc. (the "VRT Certified Rules") that are distributed under the VRT
+# Certified Rules License Agreement (v 2.0), and (ii) rules that were created by
+# Sourcefire and other third parties (the "GPL Rules") that are distributed under the
+# GNU General Public License (GPL), v2.
+# 
+# The VRT Certified Rules are owned by Sourcefire, Inc. The GPL Rules were created
+# by Sourcefire and other third parties. The GPL Rules created by Sourcefire are
+# owned by Sourcefire, Inc., and the GPL Rules not created by Sourcefire are owned by
+# their respective creators. Please see http://www.snort.org/snort/snort-team/ for a
+# list of third party owners and their respective copyrights.
+# 
+# In order to determine what rules are VRT Certified Rules or GPL Rules, please refer
+# to the VRT Certified Rules License Agreement (v2.0).
+#
+#------------
+# POP2 RULES
+#------------
+
+drop tcp $EXTERNAL_NET any -> $HOME_NET 109 (msg:"POP2 FOLD overflow attempt"; flow:established,to_server; content:"FOLD"; nocase; isdataat:256,relative; pcre:"/^FOLD\s[^\n]{256}/smi"; reference:bugtraq,283; reference:cve,1999-0920; reference:nessus,10130; classtype:attempted-admin; sid:1934; rev:10;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 109 (msg:"POP2 FOLD arbitrary file attempt"; flow:established,to_server; content:"FOLD"; nocase; pcre:"/^FOLD\s+\//smi"; sid:1935; rev:5;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 109 (msg:"POP2 x86 Linux overflow"; flow:established,to_server; content:"|EB|,[|89 D9 80 C1 06|9|D9 7C 07 80 01|"; reference:bugtraq,283; reference:cve,1999-0920; reference:nessus,10130; classtype:attempted-admin; sid:284; rev:8;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 109 (msg:"POP2 x86 Linux overflow"; flow:established,to_server; content:"|FF FF FF|/BIN/SH|00|"; reference:bugtraq,283; reference:cve,1999-0920; reference:nessus,10130; classtype:attempted-admin; sid:285; rev:8;)
+

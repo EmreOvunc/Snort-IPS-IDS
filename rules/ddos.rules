@@ -1,0 +1,75 @@
+# Copyright 2001-2013 Sourcefire, Inc. All Rights Reserved.
+#
+# This file contains (i) proprietary rules that were created, tested and certified by
+# Sourcefire, Inc. (the "VRT Certified Rules") that are distributed under the VRT
+# Certified Rules License Agreement (v 2.0), and (ii) rules that were created by
+# Sourcefire and other third parties (the "GPL Rules") that are distributed under the
+# GNU General Public License (GPL), v2.
+# 
+# The VRT Certified Rules are owned by Sourcefire, Inc. The GPL Rules were created
+# by Sourcefire and other third parties. The GPL Rules created by Sourcefire are
+# owned by Sourcefire, Inc., and the GPL Rules not created by Sourcefire are owned by
+# their respective creators. Please see http://www.snort.org/snort/snort-team/ for a
+# list of third party owners and their respective copyrights.
+# 
+# In order to determine what rules are VRT Certified Rules or GPL Rules, please refer
+# to the VRT Certified Rules License Agreement (v2.0).
+#
+#------------
+# DDOS RULES
+#------------
+
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS TFN Probe"; icmp_id:678; itype:8; content:"1234"; reference:arachnids,443; classtype:attempted-recon; sid:221; rev:4;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS tfn2k icmp possible communication"; icmp_id:0; itype:0; content:"AAAAAAAAAA"; reference:arachnids,425; classtype:attempted-dos; sid:222; rev:2;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master PONG message detected"; content:"PONG"; reference:arachnids,187; classtype:attempted-recon; sid:223; rev:3;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS TFN client command BE"; icmp_id:456; icmp_seq:0; itype:0; reference:arachnids,184; classtype:attempted-dos; sid:228; rev:3;)
+
+
+drop tcp $HOME_NET 20432 -> $EXTERNAL_NET any (msg:"DDOS shaft client login to handler"; flow:from_server,established; content:"login|3A|"; reference:arachnids,254; reference:url,security.royans.net/info/posts/bugtraq_ddos3.shtml; classtype:attempted-dos; sid:230; rev:5;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 18753 (msg:"DDOS shaft handler to agent"; content:"alive tijgu"; reference:arachnids,255; classtype:attempted-dos; sid:239; rev:2;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 20433 (msg:"DDOS shaft agent to handler"; content:"alive"; reference:arachnids,256; classtype:attempted-dos; sid:240; rev:2;)
+drop tcp $HOME_NET any <> $EXTERNAL_NET any (msg:"DDOS shaft synflood"; flow:stateless; flags:S,12; seq:674711609; reference:arachnids,253; reference:cve,2000-0138; classtype:attempted-dos; sid:241; rev:10;)
+
+#Rule submitted by rmkml
+drop ip $EXTERNAL_NET any -> $HOME_NET any (msg:"COMMUNITY DOS Tcpdump rsvp attack"; ip_proto:46; content:"|00 08 14 01 03 00 00 00|"; reference:cve,2005-1280; reference:cve,2005-1281; reference:bugtraq,13391; classtype:attempted-dos; sid:100000134; rev:1;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 1069 (msg:"COMMUNITY DOS Ethereal slimp overflow attempt"; content:"|6C C3 B2 A1 02 00 04 00 00 00 00 00 00 00 00 00 FF FF 00 00 01 00 00 00 56 57 F7|"; reference:cve,2005-3243; reference:url,www.ethereal.com/docs/release-notes/ethereal-0.10.13.html; classtype:attempted-dos; sid:100000175; rev:1;)
+drop tcp $EXTERNAL_NET any <> $HOME_NET 5005 (msg:"COMMUNITY DOS Trend Micro ServerProtect EarthAgent attempt"; flow:stateless; content:"|21 43 65 87|"; reference:cve,2005-1928; reference:url,www.idefense.com/application/poi/display?id=356&type=vulnerabilities; classtype:attempted-dos; sid:100000215; rev:2;)
+
+#Rules submitted by the Verisign MSS Operations Team
+drop tcp $EXTERNAL_NET any -> $HOME_NET 6667:7000 (msg:"COMMUNITY DOS EnergyMech parse_notice vulnerability - inbound"; flow:to_server,established; content:"NOTICE|20|"; content:!"|5c|"; within:11; reference:bugtraq,18664; classtype:attempted-dos; sid:100000686; rev:2;)
+drop tcp $HOME_NET 6667:7000 -> $EXTERNAL_NET any (msg:"COMMUNITY DOS EnergyMech parse_notice vulnerability - outbound"; flow:to_server,established; content:"NOTICE|20|"; content:!"|5c|"; within:11; reference:bugtraq,18664; classtype:attempted-dos; sid:100000687; rev:2;)
+
+#Rule submitted by Dan Protich
+#drop udp $EXTERNAL_NET !53 <> $HOME_NET !53  (msg:"COMMUNITY DOS Single-Byte UDP Flood"; content:"0"; dsize:1; classtype:attempted-dos; threshold: type threshold, track by_dst, count 200, seconds 60; sid:100000923; rev:1;)
+
+
+drop udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master message detected"; content:"l44"; reference:arachnids,186; classtype:attempted-dos; sid:231; rev:3;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 31335 (msg:"DDOS Trin00 Daemon to Master *HELLO* message detected"; content:"*HELLO*"; reference:arachnids,185; reference:url,www.sans.org/newlook/resources/IDFAQ/trinoo.htm; classtype:attempted-dos; sid:232; rev:5;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default startup password"; flow:established,to_server; content:"betaalmostdone"; reference:arachnids,197; classtype:attempted-dos; sid:233; rev:3;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default password"; flow:established,to_server; content:"gOrave"; classtype:attempted-dos; sid:234; rev:2;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 27665 (msg:"DDOS Trin00 Attacker to Master default mdie password"; flow:established,to_server; content:"killme"; classtype:bad-unknown; sid:235; rev:2;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 27444 (msg:"DDOS Trin00 Master to Daemon default password attempt"; content:"l44adsl"; reference:arachnids,197; classtype:attempted-dos; sid:237; rev:2;)
+drop icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS TFN server response"; icmp_id:123; icmp_seq:0; itype:0; content:"shell bound to port"; reference:arachnids,182; classtype:attempted-dos; sid:238; rev:6;)
+
+
+
+drop udp $EXTERNAL_NET any -> $HOME_NET 6838 (msg:"DDOS mstream agent to handler"; content:"newserver"; classtype:attempted-dos; sid:243; rev:2;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream handler to agent"; content:"stream/"; reference:cve,2000-0138; classtype:attempted-dos; sid:244; rev:3;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream handler ping to agent"; content:"ping"; reference:cve,2000-0138; classtype:attempted-dos; sid:245; rev:3;)
+drop udp $EXTERNAL_NET any -> $HOME_NET 10498 (msg:"DDOS mstream agent pong to handler"; content:"pong"; classtype:attempted-dos; sid:246; rev:2;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 12754 (msg:"DDOS mstream client to handler"; flow:to_server,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:247; rev:4;)
+drop tcp $HOME_NET 12754 -> $EXTERNAL_NET any (msg:"DDOS mstream handler to client"; flow:to_client,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:248; rev:4;)
+drop tcp $EXTERNAL_NET any -> $HOME_NET 15104 (msg:"DDOS mstream client to handler"; flow:stateless; flags:S,12; reference:arachnids,111; reference:cve,2000-0138; classtype:attempted-dos; sid:249; rev:8;)
+drop tcp $HOME_NET 15104 -> $EXTERNAL_NET any (msg:"DDOS mstream handler to client"; flow:from_server,established; content:">"; reference:cve,2000-0138; classtype:attempted-dos; sid:250; rev:4;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS - TFN client command LE"; icmp_id:51201; icmp_seq:0; itype:0; reference:arachnids,183; classtype:attempted-dos; sid:251; rev:3;)
+
+
+drop icmp 3.3.3.3/32 any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht server spoof"; icmp_id:666; itype:0; reference:arachnids,193; classtype:attempted-dos; sid:224; rev:3;)
+drop icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht gag server response"; icmp_id:669; itype:0; content:"sicken"; reference:arachnids,195; classtype:attempted-dos; sid:225; rev:6;)
+drop icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"DDOS Stacheldraht server response"; icmp_id:667; itype:0; content:"ficken"; reference:arachnids,191; classtype:attempted-dos; sid:226; rev:6;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client spoofworks"; icmp_id:1000; itype:0; content:"spoofworks"; reference:arachnids,192; classtype:attempted-dos; sid:227; rev:6;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client check gag"; icmp_id:668; itype:0; content:"gesundheit!"; reference:arachnids,194; classtype:attempted-dos; sid:236; rev:6;)
+drop icmp $EXTERNAL_NET any -> $HOME_NET any (msg:"DDOS Stacheldraht client check skillz"; icmp_id:666; itype:0; content:"skillz"; reference:arachnids,190; classtype:attempted-dos; sid:229; rev:5;)
+drop icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht handler->agent niggahbitch"; icmp_id:9015; itype:0; content:"niggahbitch"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:1854; rev:7;)
+drop icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht agent->handler skillz"; icmp_id:6666; itype:0; content:"skillz"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:1855; rev:7;)
+drop icmp $EXTERNAL_NET any <> $HOME_NET any (msg:"DDOS Stacheldraht handler->agent ficken"; icmp_id:6667; itype:0; content:"ficken"; reference:url,staff.washington.edu/dittrich/misc/stacheldraht.analysis; classtype:attempted-dos; sid:1856; rev:7;)
